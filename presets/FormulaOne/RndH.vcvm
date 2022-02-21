@@ -1,0 +1,26 @@
+{
+  "plugin": "dbRackFormulaOne",
+  "model": "FormulaOne",
+  "version": "2.0.0",
+  "params": [
+    {
+      "value": 0.20000040531158447,
+      "id": 0
+    },
+    {
+      "value": 0.62250030040740967,
+      "id": 1
+    },
+    {
+      "value": 0.069999665021896362,
+      "id": 2
+    },
+    {
+      "value": 0.0,
+      "id": 3
+    }
+  ],
+  "data": {
+    "formula": "if(st(chn,z)>0) {\n  bufw(chn,rnd());\n}\nvar out := bufr(chn)*10*a;\n"
+  }
+}

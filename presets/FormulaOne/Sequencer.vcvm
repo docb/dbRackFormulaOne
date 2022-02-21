@@ -1,0 +1,26 @@
+{
+  "plugin": "dbRackFormulaOne",
+  "model": "FormulaOne",
+  "version": "2.0.0",
+  "params": [
+    {
+      "value": 0.67250025272369385,
+      "id": 0
+    },
+    {
+      "value": 0.62250030040740967,
+      "id": 1
+    },
+    {
+      "value": 0.069999665021896362,
+      "id": 2
+    },
+    {
+      "value": 0.0,
+      "id": 3
+    }
+  ],
+  "data": {
+    "formula": "var seq[8] := { 0,3/12,5/12,\n             7/12,10/12,7/12,\n             5/12,3/12};\n\nif(st(0,z)>0) { \n v1:=v1+1;\n if(v1>=8) v1:=0;\n} \nif(st1(0,y)>0) v1:=0;\nvar out := seq[v1];\n"
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "plugin": "dbRackFormulaOne",
+  "model": "FormulaOne",
+  "version": "2.0.0",
+  "params": [
+    {
+      "value": 0.27250084280967712,
+      "id": 0
+    },
+    {
+      "value": 0.69000023603439331,
+      "id": 1
+    },
+    {
+      "value": 0.075000613927841187,
+      "id": 2
+    },
+    {
+      "value": 0.49749964475631714,
+      "id": 3
+    },
+    {
+      "value": 0.0,
+      "id": 4
+    }
+  ],
+  "data": {
+    "formula": "var delay_ms:= 2.1;\nvar len:= delay_ms/1000*sr;\nrblen(chn,len);\nvar c0 := clamp((c+1)/2+y/10*a,0,0.99);\nvar x0 := rbget(chn,c0*len); \nvar nx := x/2 + x0 * d;\nrbpush(chn,nx);\nvar out:=x0+nx;\nvar x1 := rbget(chn,c0*len/2);\nout1:=dcb2(chn,x1+nx);\ndcb(chn,out);\n\n\n"
+  }
+}

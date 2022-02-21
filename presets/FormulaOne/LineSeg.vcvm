@@ -1,0 +1,30 @@
+{
+  "plugin": "dbRackFormulaOne",
+  "model": "FormulaOne",
+  "version": "2.0.0",
+  "params": [
+    {
+      "value": 0.67000055313110352,
+      "id": 0
+    },
+    {
+      "value": 0.65000027418136597,
+      "id": 1
+    },
+    {
+      "value": 0.075000613927841187,
+      "id": 2
+    },
+    {
+      "value": 0.49749964475631714,
+      "id": 3
+    },
+    {
+      "value": 0.0,
+      "id": 4
+    }
+  ],
+  "data": {
+    "formula": "var vals[6]:={0,5,3,2,2,0};\nvar durs[5]:={0.1,0.2,0.5,0.3,0.2};\nif(st(0,w)>0) v1:=0;\nvar pos:= v1; var idx :=-1;\nvar ps := 0;var i:=0;\nrepeat\n  ps+=durs[i];\n  i+=1;\nuntil ((i>durs[]) or (pos<ps));\nif(i<=durs[]) idx:=i-1;\nvar o; var pct;\nif(idx==-1) o:=vals[5]; else {\n  pct:= (durs[idx]-(ps-pos))/durs[idx];\n  o:= vals[idx]+(vals[idx+1]-vals[idx])*pct;\n};\nv1+=stim;\nvar out:=o;  \n\n\n"
+  }
+}

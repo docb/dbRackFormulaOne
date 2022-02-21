@@ -1,0 +1,26 @@
+{
+  "plugin": "dbRackFormulaOne",
+  "model": "FormulaOne",
+  "version": "2.0.0",
+  "params": [
+    {
+      "value": 0.67250025272369385,
+      "id": 0
+    },
+    {
+      "value": 0.62250030040740967,
+      "id": 1
+    },
+    {
+      "value": 0.069999665021896362,
+      "id": 2
+    },
+    {
+      "value": 0.0,
+      "id": 3
+    }
+  ],
+  "data": {
+    "formula": "if(v3==0) {\n  var n := -1;\n  for(var i:=0;i<36;i+=1) {\n    bufw(i,n);\n    n+=1/12;\n  };\n  v3:=1;\n};\nvar chord[16]:={9,12,16,19, 9,12,14,18,\n                 7,11,14,18,  7,11,12,16};\nif(st(0,z)>0) {v1+=1; if(v1>=4) v1:=0;}\nvar out: = bufr(chord[chn+v1*4]);\n\n"
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "plugin": "dbRackFormulaOne",
+  "model": "FormulaOne",
+  "version": "2.0.0",
+  "params": [
+    {
+      "value": 0.70500016212463379,
+      "id": 0
+    },
+    {
+      "value": 0.62250030040740967,
+      "id": 1
+    },
+    {
+      "value": 0.069999665021896362,
+      "id": 2
+    },
+    {
+      "value": 0.0,
+      "id": 3
+    },
+    {
+      "value": 0.0,
+      "id": 4
+    }
+  ],
+  "data": {
+    "formula": "var freq := 261.626 * pow(2,w);\nvar p:= bufr(chn);\nvar o:=a*4*(\nsin(2*pi*p)+\nsin(6*pi*p)/3+\nsin(10*pi*p)/5+\nsin(14*pi*p)/7\n);\nvar phs:= p+stim*freq;\nphs-=trunc(phs);\nbufw(chn,phs);\nvar out:=o; \n"
+  }
+}

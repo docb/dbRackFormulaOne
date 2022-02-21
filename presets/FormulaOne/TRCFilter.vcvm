@@ -1,0 +1,26 @@
+{
+  "plugin": "dbRackFormulaOne",
+  "model": "FormulaOne",
+  "version": "2.0.0",
+  "params": [
+    {
+      "value": 0.67250025272369385,
+      "id": 0
+    },
+    {
+      "value": 0.62250030040740967,
+      "id": 1
+    },
+    {
+      "value": -0.57749992609024048,
+      "id": 2
+    },
+    {
+      "value": 0.0,
+      "id": 3
+    }
+  ],
+  "data": {
+    "formula": "var f := clamp(2^(c*8),0.001,0.5);\nvar fc := 2/f;\nvar out:= (x + bufr(chn) - buf1r(chn) * (1 - fc)) /(1 + fc);\nbufw(chn,x); \nbuf1w(chn,out);\n// dcblock\ndcb(chn,out);"
+  }
+}
