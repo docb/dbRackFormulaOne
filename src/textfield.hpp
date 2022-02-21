@@ -1,6 +1,8 @@
 #pragma once
 
 // From Rack ui but modified to have more possibilities to customize.
+// Uses also some functions of the blender utilities directly to provide more lines in the text.
+// Adds the feature to move up and down using the arrow keys.
 
 #include "plugin.hpp"
 #define _BND_MAX_ROWS 100

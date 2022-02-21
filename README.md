@@ -1,3 +1,4 @@
+
 # Formula One
 
 A script/formula evaluation module for VCVRack. This module can do almost anything, and it is quite fast.
@@ -8,7 +9,25 @@ It is based on the [exprtk expression library](http://www.partow.net/programming
 which has very good [benchmarks](https://github.com/ArashPartow/math-parser-benchmark-project#the-rounds).
 
 
+
 ## Examples and Usecases
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+
+- [A simple polyphonic oscillator](#a-simple-polyphonic-oscillator)
+   - [Step by Step](#step-by-step)
+- [An external phase controlled Oscillator (Waveshaper, Wavefolder or whatever)](#an-external-phase-controlled-oscillator-waveshaper-wavefolder-or-whatever)
+- [A Simple Polyphonic Filter](#a-simple-polyphonic-filter)
+   - [Step by Step](#step-by-step-1)
+- [A Polyphonic Comb Filter (Chorus,Flanger,Phaser or whatever)](#a-polyphonic-comb-filter-chorusflangerphaser-or-whatever)
+   - [Step by Step](#step-by-step-2)
+- [A Stereo Delay](#a-stereo-delay)
+- [A Polyphonic Random and Hold](#a-polyphonic-random-and-hold)
+- [A Simple Sequencer](#a-simple-sequencer)
+- [A Chord Sequencer](#a-chord-sequencer)
+- [A Drum Sequencer](#a-drum-sequencer)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ### A simple polyphonic oscillator
 
