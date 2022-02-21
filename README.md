@@ -8,24 +8,24 @@ A script/formula evaluation module for VCVRack. This module can do almost anythi
 It is based on the [exprtk expression library](http://www.partow.net/programming/exprtk/index.html) 
 which has very good [benchmarks](https://github.com/ArashPartow/math-parser-benchmark-project#the-rounds).
 
-
-
 ## Examples and Usecases
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
 - [A simple polyphonic oscillator](#a-simple-polyphonic-oscillator)
-   - [Step by Step](#step-by-step)
-- [An external phase controlled Oscillator (Waveshaper, Wavefolder or whatever)](#an-external-phase-controlled-oscillator-waveshaper-wavefolder-or-whatever)
+  - [Step by Step](#step-by-step)
+- [An external phase controlled Oscillator](#an-external-phase-controlled-oscillator)
+- [A Wave Folder](#a-wave-folder)
 - [A Simple Polyphonic Filter](#a-simple-polyphonic-filter)
-   - [Step by Step](#step-by-step-1)
-- [A Polyphonic Comb Filter (Chorus,Flanger,Phaser or whatever)](#a-polyphonic-comb-filter-chorusflangerphaser-or-whatever)
-   - [Step by Step](#step-by-step-2)
+  - [Step by Step](#step-by-step-1)
+- [A Polyphonic Comb Filter (Chorus,Flanger or whatever)](#a-polyphonic-comb-filter-chorusflanger-or-whatever)
+  - [Step by Step](#step-by-step-2)
 - [A Stereo Delay](#a-stereo-delay)
 - [A Polyphonic Random and Hold](#a-polyphonic-random-and-hold)
 - [A Simple Sequencer](#a-simple-sequencer)
 - [A Chord Sequencer](#a-chord-sequencer)
 - [A Drum Sequencer](#a-drum-sequencer)
+- [A Line Segement Envelope Generator](#a-line-segement-envelope-generator)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -69,7 +69,7 @@ value of the knob `a`;
 `var out:=o;` the last expression value in the script is returned to the module and written
 into the output `out`.
 
-### An external phase controlled Oscillator (Waveshaper, Wavefolder or whatever)
+### An external phase controlled Oscillator
 ![](images/PulseWave.png?raw=true)
 
 ```Tcl
@@ -84,6 +84,7 @@ a*5*(
 This example does the same as the one above but uses the special input `t` as phase.
 The values of `t` are normalized from -5V/5V to 0V/1V.
 
+### A Wave Folder
 ![](images/Wavefolder.png?raw=true)
 
 `sin((c*5)*t*2*pi+b*5)*a*5`
@@ -92,6 +93,9 @@ The same principle can be used to make a wave folder.
 The knob `c` controls the depth and the knob `b` controls the offset.
 
 ### A Simple Polyphonic Filter
+
+This example shows how to implement a simple LP filter. The algorithm is directly taken from the VCV Rack
+[source](https://github.com/VCVRack/Rack/blob/v2/include/dsp/filter.hpp)
 
 ![](images/Filter.png?raw=true)
 
@@ -118,7 +122,8 @@ via bufr,buf1r,buf2r,buf3r and written via bufw,buf1w,buf2w,buf3w
 
 `dcb(chn,out);`  output the dc blocked sample.
 
-### A Polyphonic Comb Filter (Chorus,Flanger,Phaser or whatever)
+### A Polyphonic Comb Filter (Chorus,Flanger or whatever)
+
 ![](images/Comb.png?raw=true)
 ```Tcl
 var delay_ms:= 2.1;
@@ -186,6 +191,7 @@ Similar to the last example. The knob `a` controls the feedback and the knob `b`
 The position in the call rbget is relative to the last write position + 1. With position 0 it returns the
 sample which was written length samples before. `rbget(0,-1)` would return the last written sample.
 
+
 ### A Polyphonic Random and Hold
 
 ![](images/RndH.png?raw=true)
@@ -201,7 +207,6 @@ The buffer is used to hold the value until the next trigger arrives.
 NB the polyphony is determined by the input channels in the following way:
 If the input t is connected the channels of t is used, otherwise the maximum of the
 channels of the inputs w,x,y,z. The image above shows the case with one channel.
-
 
 ### A Simple Sequencer
 
@@ -296,3 +301,31 @@ and the sequence starts from the beginning.
 
 Further ideas: set the parameters for bd,sn,hh to values in between zero and one and
 output the current value on output 1 for using as a velocity.
+
+### A Line Segement Envelope Generator
+
+![](images/LineSeg.png?raw=true)
+
+```Tcl
+var vals[6]:={0,5,3,2,2,0};
+var durs[5]:={0.1,0.2,0.5,0.3,0.2};
+if(st(0,w)>0) v1:=0;
+var pos:= v1; var idx :=-1;
+var ps := 0;var i:=0;
+repeat
+  ps+=durs[i];
+  i+=1;
+until ((i>durs[]) or (pos<ps));
+if(i<=durs[]) idx:=i-1;
+var o; var pct;
+if(idx==-1) o:=vals[5]; else {
+  pct:= (durs[idx]-(ps-pos))/durs[idx];
+  o:= vals[idx]+(vals[idx+1]-vals[idx])*pct;
+};
+v1+=stim;
+var out:=o;  
+
+```
+Outputs line segments according to the values and duration arrays. It is triggered via the
+`w` input.  NB and TBD: this algorithm can be made much better and faster.
+
