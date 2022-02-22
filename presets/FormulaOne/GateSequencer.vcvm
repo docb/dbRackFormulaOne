@@ -25,6 +25,6 @@
     }
   ],
   "data": {
-    "formula": "var vals[6]:={0,5,3,2,2,0};\nvar durs[5]:={0.3,0.2,0.5,0.3,0.2};\nif(st(0,w)>0) { v1:=0; v2:=0; v3:=0; }\nvar end:=0;\nif(v1>=v2+durs[v3]) {\n  if(v3>=5) end:=1;\n  else { v2+=durs[v3]; v3+=1; }\n};\nvar o;var pct;\nif(end==1) {\n  o:=vals[5]; \n} else {\n  pct:= (v1-v2)/durs[v3];\n  o:=vals[v3]+(vals[v3+1]-vals[v3])*pct;  \n};\nv1+=stim;\no;\n"
+    "formula": "var data[16] := { \n1,0,0,0,1,0,0,0,1,0,0,0,1,0,0,1};\nvar dur := 10; var gate:=0;\nif(st(chn,z)>0) {\n    if(data[v1]>0) {\n      bufw(chn,dur);\n    } else {\n      bufw(chn,0);\n    } \n};\nif(bufr(chn)>0) { \n  gate:=10; bufw(chn,bufr(chn)-1);\n};\nif(st1(0,z)>0) {\n  v1+=1;\n  if(v1>=16) v1:=0;\n};\nvar out:= gate;\n"
   }
 }

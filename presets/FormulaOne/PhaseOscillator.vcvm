@@ -1,0 +1,30 @@
+{
+  "plugin": "dbRackFormulaOne",
+  "model": "FormulaOne",
+  "version": "2.0.0",
+  "params": [
+    {
+      "value": 0.67000055313110352,
+      "id": 0
+    },
+    {
+      "value": 0.65000027418136597,
+      "id": 1
+    },
+    {
+      "value": 0.075000613927841187,
+      "id": 2
+    },
+    {
+      "value": 0.49749964475631714,
+      "id": 3
+    },
+    {
+      "value": 0.0,
+      "id": 4
+    }
+  ],
+  "data": {
+    "formula": "a*5*(\n   sin(2*pi*t)+\n   sin(6*pi*t)/3+\n   sin(10*pi*t)/5+\n   sin(14*pi*t)/7\n)"
+  }
+}
