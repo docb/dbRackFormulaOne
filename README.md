@@ -12,6 +12,9 @@ It is not intended for replacing native modules because they still will be faste
 and provide more usability. It is for experimenting,learning and making special things. 
 
 ## Examples and Usecases
+
+The examples are available as factory presets.
+
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
