@@ -317,3 +317,30 @@ o;
 Outputs line segments according to the values and duration arrays. It is triggered via the
 `w` input.
 
+### CZ-Series PD Filter sweep
+
+![](images/PDFilterSweep.png?raw=true)
+
+```Tcl
+var freq := 261.626 * pow(2,w);
+var p:= bufr(chn);
+var phs:= p+stim*freq;
+if(phs>=1) phs:=0;
+bufw(chn,phs);
+var inv:=1-p;
+out1:=p;
+var freq2 := 261.626 * pow(2,a*5);
+var p2:= buf2r(chn);
+var o:= sin(2*pi*p2)*inv;
+var phs2:= p2+stim*freq2;
+phs2-=trunc(phs2);
+if(phs==0) phs2:=0;
+buf2w(chn,phs2);
+
+var out:=o*5;
+```
+
+This script implements the
+[Resonant Filter Simulation](https://en.wikipedia.org/wiki/Phase_distortion_synthesis)
+from the Casio CZ Series. The knob `a` controls the resonant frequency.
+

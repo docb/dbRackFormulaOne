@@ -11,13 +11,12 @@ CXXFLAGS +=
 LDFLAGS +=
 
 include $(RACK_DIR)/arch.mk
-
 ifdef ARCH_WIN
 # the exprtk cannot compiled on mingw because a too big obj file is generated
 # with this option it is under the limit but it is slower
 FLAGS += -Dexprtk_disable_enhanced_features
 
-#LDFLAGS += -Wa,-mbig-obj // doesnt work
+# the option -Wa,-mbig-obj // did not work so far
 endif
 
 # Add .cpp files to the build
