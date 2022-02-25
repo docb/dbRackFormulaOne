@@ -12,6 +12,7 @@ void FormulaOne::process(const ProcessArgs &args) {
     b=params[B_PARAM].getValue();
     c=params[C_PARAM].getValue();
     d=params[D_PARAM].getValue();
+    e=params[E_PARAM].getValue();
     int channels=1;
     if(inputs[P_INPUT].isConnected()) {
       channels=inputs[P_INPUT].getChannels();
