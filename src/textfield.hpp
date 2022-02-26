@@ -12,7 +12,7 @@ struct TextRow {
   int end;
 };
 struct MTextField : OpaqueWidget {
-  ScrollWidget *scoll;
+  ScrollWidget *scroll;
   std::string text;
   std::string placeholder;
   /** Masks text with "*". */
@@ -83,4 +83,6 @@ struct MTextField : OpaqueWidget {
   void cursorToNextWord();
 
   virtual void createContextMenu();
+
+  void getCursorPosition(float &px,float &py);
 };

@@ -113,7 +113,38 @@ void MTextField::_bndCaretPosition(NVGcontext *ctx,float x,float y,float desc,fl
       break;
   }
 }
+void MTextField::getCursorPosition(float &px, float& py) {
+  std::shared_ptr<window::Font> font=APP->window->loadFont(fontPath);
+  float pleft=BND_TEXT_RADIUS;
+  int cbegin=std::min(cursor,selection);
+  int cend=std::max(cursor,selection);
+  float x=0; float y=0; float w=box.size.x;
+  NVGcontext *ctx = APP->window->vg;
+  if(font&&font->handle>=0) {
 
+    x+=pleft;
+    y+=BND_WIDGET_HEIGHT-BND_TEXT_PAD_DOWN;
+
+    nvgFontFaceId(ctx,font->handle);
+    nvgFontSize(ctx,fontSize);
+    nvgTextAlign(ctx,NVG_ALIGN_LEFT|NVG_ALIGN_BASELINE);
+
+    w-=BND_TEXT_RADIUS+pleft;
+
+    if(cend>=cbegin) {
+      int c0r,c1r;
+      float c0x,c0y,c1x,c1y;
+      float desc,lh;
+      static NVGtextRow rows[_BND_MAX_ROWS];
+      int nrows=nvgTextBreakLines(ctx,text.c_str(),text.c_str()+cend+1,w,rows,_BND_MAX_ROWS);
+      nvgTextMetrics(ctx,NULL,&desc,&lh);
+
+      _bndCaretPosition(ctx,x,y,desc,lh,text.c_str()+cbegin,rows,nrows,&c0r,&c0x,&c0y);
+      px=c0x;
+      py=c0y;
+    }
+  }
+}
 void MTextField::_bndIconLabelCaret(NVGcontext *ctx,float x,float y,float w,float h,NVGcolor color,float fontsize,const char *label,NVGcolor caretcolor,int cbegin,int cend) {
   std::shared_ptr<window::Font> font=APP->window->loadFont(fontPath);
   float pleft=BND_TEXT_RADIUS;
@@ -295,19 +326,17 @@ void MTextField::onSelectKey(const SelectKeyEvent &e) {
       }
       e.consume(this);
     }
-    // Up (placeholder)
-    if(e.key==GLFW_KEY_UP) {
-      //std::sregex_token_iterator(str.begin(), str.end(), std::regex(regex), -1), std::sregex_token_iterator()
 
+    if(e.key==GLFW_KEY_UP) {
       if(cursor>0) {
-        INFO("cursor=%d",cursor);
+        //INFO("cursor=%d",cursor);
         split();
         for(int k=0;k<currentMax;k++) {
-          INFO("%d %d",textRows[k].begin,textRows[k].end);
+          //INFO("%d %d",textRows[k].begin,textRows[k].end);
         }
         for(int k=0;k<currentMax;k++) {
           if(cursor>=textRows[k].begin&&cursor<=textRows[k].end) {
-            INFO("row=%d",k);
+            //INFO("row=%d",k);
             if(k>0) {
               int pos=std::min(cursor-textRows[k].begin,textRows[k-1].end-textRows[k-1].begin);
               cursor=textRows[k-1].begin+pos;
@@ -322,16 +351,16 @@ void MTextField::onSelectKey(const SelectKeyEvent &e) {
       }
       e.consume(this);
     }
-    // Down (placeholder)
+
     if(e.key==GLFW_KEY_DOWN) {
       if(cursor<text.size()) {
         split();
         for(int k=0;k<currentMax;k++) {
-          INFO("%d %d",textRows[k].begin,textRows[k].end);
+          //INFO("%d %d",textRows[k].begin,textRows[k].end);
         }
         for(int k=0;k<currentMax;k++) {
           if(cursor>=textRows[k].begin&&cursor<=textRows[k].end) {
-            INFO("row=%d",k);
+            //INFO("row=%d",k);
             if(k<currentMax-1) {
               int pos=std::min(cursor-textRows[k].begin,textRows[k+1].end-textRows[k+1].begin);
               cursor=textRows[k+1].begin+pos;
@@ -413,7 +442,12 @@ void MTextField::onSelectKey(const SelectKeyEvent &e) {
     if(e.keyName!="") {
       e.consume(this);
     }
-
+    float px,py;
+    getCursorPosition(px,py);
+    //INFO("%f %f %f %f %f",px,py,scroll->offset.x,scroll->offset.y,scroll->box.size.y);
+    while(py>176+scroll->offset.y) scroll->offset.y+=10;
+    while(py<scroll->offset.y) scroll->offset.y-=10;
+    if(scroll->offset.y<0) scroll->offset.y = 0;
     assert(0<=cursor);
     assert(cursor<=(int)text.size());
     assert(0<=selection);

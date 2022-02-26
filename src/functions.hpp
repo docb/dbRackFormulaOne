@@ -55,9 +55,25 @@ T linseg(T in,const std::vector<T> &params) {
     if(in<s) break;
   }
   if(j>=len) return params[len%2==1?len-1:0];
-  //float pre=j==1?0:s-params[j-2];
   float pct=params[j]==0?1:(in-pre)/params[j];
   return params[j-1]+pct*(params[(j+1)<len?j+1:0]-params[j-1]);
+}
+template<typename T>
+T expseg(T in,const std::vector<T> &params) {
+  int len = params.size();
+  if(len<4 || (len-1)%3!=0) return T(0);
+  float s=0;
+  float pre=0;
+  int j=1;
+  for(;j<len;j+=3) {
+    pre=s;
+    s+=params[j];
+    if(in<s) break;
+  }
+  if(j>=len) return params[len-1];
+  float pct=params[j]==0?1:(in-pre)/params[j];
+  float f=params[j+1]==0?pct:(1 - std::exp( pct*params[j+1])) / (1 - std::exp(params[j+1]));
+  return params[j-1]+f*(params[j+2]-params[j-1]);
 }
 
 template<typename T>

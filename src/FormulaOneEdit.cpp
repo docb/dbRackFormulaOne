@@ -91,14 +91,16 @@ struct FormulaOneEditWidget : ModuleWidget {
 		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
 		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-    scrollWidget = new ScrollWidget();
+    scrollWidget = new TextScrollWidget();
     scrollWidget->box.size=mm2px(Vec(176,115));
     scrollWidget->box.pos = mm2px(Vec(3.5f,MHEIGHT-7-115));
+    INFO("%f",scrollWidget->box.size.y);
     addChild(scrollWidget);
     auto textField=createWidget<ExtFormulaTextField>(Vec(0,0));
     textField->box.size=mm2px(Vec(200,400));
     textField->multiline=true;
     textField->setModule(module);
+    textField->scroll = scrollWidget;
 
     scrollWidget->container->addChild(textField);
 	}

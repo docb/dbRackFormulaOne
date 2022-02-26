@@ -103,14 +103,16 @@ struct FormulaOneWidget : ModuleWidget {
     //auto textDisplay = createWidget<LedDisplay>(mm2px(Vec(3, 13)));
     //textDisplay->box.size = mm2px(Vec(85, 51));
     //addChild(textDisplay);
-    scrollWidget=new ScrollWidget();
+    scrollWidget=new TextScrollWidget();
     scrollWidget->box.size=mm2px(Vec(85,68));
     scrollWidget->box.pos=mm2px(Vec(3.5f,MHEIGHT-54-68));
+    INFO("%f",scrollWidget->box.size.y);
     addChild(scrollWidget);
     auto textField=createWidget<FormulaTextField>(Vec(0,0));
     textField->setModule(module);
     textField->box.size=mm2px(Vec(200,160));
     textField->multiline=true;
+    textField->scroll=scrollWidget;
     scrollWidget->container->addChild(textField);
     addChild(createLight<MediumLight<GreenRedLight>>(mm2px(Vec(45,MHEIGHT-29)),module,FormulaOne::ERROR_LIGHT));
     addParam(createParam<TrimbotWhite9>(mm2px(Vec(8.75,MHEIGHT-34.5-8.985f)),module,FormulaOne::A_PARAM));

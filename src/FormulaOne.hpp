@@ -57,7 +57,7 @@ struct RB {
   }
 };
 
-template<typename T,size_t S,size_t K>
+template<typename T,size_t S,int K>
 struct RBuffers {
   RB<T,S> buffers[K];
 
@@ -87,7 +87,7 @@ struct RBuffers {
 };
 
 
-template<typename T,size_t S>
+template<typename T,int S>
 struct Buffer {
   T data[S]={};
 
@@ -121,8 +121,60 @@ struct Random : public exprtk::ifunction<T> {
   Random() : exprtk::ifunction<T>(0) {
   }
 
-  inline T operator()() {
+  inline T operator()() override {
     return T(rnd.nextDouble());
+  }
+};
+
+template<typename T>
+struct BetaRnd : public exprtk::ifunction<T> {
+  using exprtk::ifunction<T>::operator();
+  RND rnd;
+
+  BetaRnd() : exprtk::ifunction<T>(2) {
+  }
+
+  inline T operator()(const T &a, const T &b) override {
+    return T(rnd.nextBeta(a,b));
+  }
+};
+
+template<typename T>
+struct Weibull : public exprtk::ifunction<T> {
+  using exprtk::ifunction<T>::operator();
+  RND rnd;
+
+  Weibull() : exprtk::ifunction<T>(1) {
+  }
+
+  inline T operator()(const T &a) override {
+    return T(rnd.nextWeibull(a));
+  }
+};
+
+template<typename T>
+struct Cauchy : public exprtk::ifunction<T> {
+  using exprtk::ifunction<T>::operator();
+  RND rnd;
+
+  Cauchy() : exprtk::ifunction<T>(1) {
+  }
+
+  inline T operator()(const T &a) override {
+    return T(rnd.nextCauchy(a));
+  }
+};
+
+template<typename T>
+struct Coin : public exprtk::ifunction<T> {
+  using exprtk::ifunction<T>::operator();
+  RND rnd;
+
+  Coin() : exprtk::ifunction<T>(1) {
+  }
+
+  inline T operator()(const T &a) override {
+    return T(rnd.nextCoin(a)?T(0):T(1));
   }
 };
 
@@ -134,7 +186,7 @@ struct STrigger : public exprtk::ifunction<T> {
   STrigger() : exprtk::ifunction<T>(2) {
   }
 
-  inline T operator()(const T &nr,const T &v) {
+  inline T operator()(const T &nr,const T &v)  override  {
     int n=int(nr);
     if(n>=0&&n<16)
       return st[n].process(v)?1.f:0.f;
@@ -150,7 +202,7 @@ struct DCBlock : public exprtk::ifunction<T> {
   DCBlock() : exprtk::ifunction<T>(2) {
   }
 
-  inline T operator()(const T &nr,const T &v) {
+  inline T operator()(const T &nr,const T &v)  override {
     int n=int(nr);
     if(n>=0&&n<16)
       return dcb[n].process(v);
@@ -172,7 +224,7 @@ struct RBSetLength : public exprtk::ifunction<T> {
   RBSetLength() : exprtk::ifunction<T>(2) {
   }
 
-  inline T operator()(const T &nr,const T &v) {
+  inline T operator()(const T &nr,const T &v)  override {
     if(buffers)
       buffers->setLen(int(nr),int(v));
     return v;
@@ -187,7 +239,7 @@ struct RBPush : public exprtk::ifunction<T> {
   RBPush() : exprtk::ifunction<T>(2) {
   }
 
-  inline T operator()(const T &nr,const T &v) {
+  inline T operator()(const T &nr,const T &v)  override {
     if(buffers) {
       buffers->push(int(nr),v);
       return v;
@@ -204,7 +256,7 @@ struct RBGet : public exprtk::ifunction<T> {
   RBGet() : exprtk::ifunction<T>(2) {
   }
 
-  inline T operator()(const T &nr,const T &v) {
+  inline T operator()(const T &nr,const T &v)  override {
     if(buffers)
       return buffers->get(int(nr),int(v));
     return T(0);
@@ -219,7 +271,7 @@ struct BufferWrite : public exprtk::ifunction<T> {
   BufferWrite() : exprtk::ifunction<T>(2) {
   }
 
-  inline T operator()(const T &idx,const T &v) {
+  inline T operator()(const T &idx,const T &v)  override {
     if(buffer) {
       buffer->write(int(idx),v);
     }
@@ -235,14 +287,14 @@ struct BufferRead : public exprtk::ifunction<T> {
   BufferRead() : exprtk::ifunction<T>(1) {
   }
 
-  inline T operator()(const T &pos) {
+  inline T operator()(const T &pos)  override {
     return buffer?buffer->read((int)pos):0.f;
   }
 };
 
 template<typename T>
 struct Poly : public exprtk::ivararg_function<T> {
-  inline T operator()(const std::vector<T> &arglist) {
+  inline T operator()(const std::vector<T> &arglist)  override {
     T result=T(0);
     if(!arglist.empty()) {
       T in=arglist[0];
@@ -257,7 +309,7 @@ struct Poly : public exprtk::ivararg_function<T> {
 
 template<typename T>
 struct Chebyshev : public exprtk::ivararg_function<T> {
-  inline T operator()(const std::vector<T> &arglist) {
+  inline T operator()(const std::vector<T> &arglist)  override {
     T result=T(0);
     if(!arglist.empty()) {
       T in=arglist[0];
@@ -272,7 +324,7 @@ struct Chebyshev : public exprtk::ivararg_function<T> {
 
 template<typename T>
 struct LinSeg : public exprtk::ivararg_function<T> {
-  inline T operator()(const std::vector<T> &arglist) {
+  inline T operator()(const std::vector<T> &arglist) override  {
     T result=T(0);
     if(!arglist.empty()) {
       T in=arglist[0];
@@ -286,13 +338,28 @@ struct LinSeg : public exprtk::ivararg_function<T> {
 };
 
 template<typename T>
-struct Spline : public exprtk::ivararg_function<T> {
-  inline T operator()(const std::vector<T> &arglist) {
+struct ExpSeg : public exprtk::ivararg_function<T> {
+  inline T operator()(const std::vector<T> &arglist) override  {
     T result=T(0);
     if(!arglist.empty()) {
       T in=arglist[0];
       std::vector<T> params;
       for(int i=1;i<arglist.size();i++)
+        params.push_back(arglist[i]);
+      result=expseg(in,params);
+    }
+    return result;
+  }
+};
+
+template<typename T>
+struct Spline : public exprtk::ivararg_function<T> {
+  inline T operator()(const std::vector<T> &arglist) override  {
+    T result=T(0);
+    if(!arglist.empty()) {
+      T in=arglist[0];
+      std::vector<T> params;
+      for(size_t i=1;i<arglist.size();i++)
         params.push_back(arglist[i]);
       result=spline(in,params);
     }
@@ -307,11 +374,12 @@ struct Saw : public exprtk::ifunction<T> {
   Saw() : exprtk::ifunction<T>(1) {
   }
 
-  inline T operator()(const T &v) {
+  inline T operator()(const T &v) override  {
     return saw(v);
   }
 
 };
+
 template<typename T>
 struct Tri : public exprtk::ifunction<T> {
   using exprtk::ifunction<T>::operator();
@@ -319,11 +387,12 @@ struct Tri : public exprtk::ifunction<T> {
   Tri() : exprtk::ifunction<T>(1) {
   }
 
-  inline T operator()(const T &v) {
+  inline T operator()(const T &v) override  {
     return tri(v);
   }
 
 };
+
 template<typename T>
 struct Scale : public exprtk::ifunction<T> {
   using exprtk::ifunction<T>::operator();
@@ -331,11 +400,12 @@ struct Scale : public exprtk::ifunction<T> {
   Scale() : exprtk::ifunction<T>(5) {
   }
 
-  inline T operator()(const T &v,const T&min,const T&max,const T&newmin,const T&newmax) {
+  inline T operator()(const T &v,const T &min,const T &max,const T &newmin,const T &newmax)  override {
     return scale(v,min,max,newmin,newmax);
   }
 
 };
+
 template<typename T>
 struct Scale1 : public exprtk::ifunction<T> {
   using exprtk::ifunction<T>::operator();
@@ -343,10 +413,11 @@ struct Scale1 : public exprtk::ifunction<T> {
   Scale1() : exprtk::ifunction<T>(3) {
   }
 
-  inline T operator()(const T &v,const T&min,const T&max) {
+  inline T operator()(const T &v,const T &min,const T &max)  override {
     return scale(v,-1.f,1.f,min,max);
   }
 };
+
 struct function_definition {
   std::string name;
   std::string body;
@@ -441,7 +512,6 @@ struct parse_function_definition_impl : public exprtk::lexer::parser_helper {
 };
 
 
-
 struct FormulaOne : Module {
 
   enum ParamId {
@@ -507,11 +577,17 @@ struct FormulaOne : Module {
   Poly<float> poly;
   Chebyshev<float> chebyshev;
   LinSeg<float> linseg;
+  ExpSeg<float> expseg;
   Spline<float> spline;
   Saw<float> saw;
   Tri<float> tri;
   Scale<float> scale;
   Scale1<float> scale1;
+  Cauchy<float> cauchy;
+  Coin<float> coin;
+  BetaRnd<float> beta;
+  Weibull<float> weibull;
+
 
   FormulaOne() {
     config(PARAMS_LEN,INPUTS_LEN,OUTPUTS_LEN,LIGHTS_LEN);
@@ -578,6 +654,7 @@ struct FormulaOne : Module {
     symbol_table.add_function("poly",poly);
     symbol_table.add_function("chb",chebyshev);
     symbol_table.add_function("lseg",linseg);
+    symbol_table.add_function("eseg",expseg);
     symbol_table.add_function("spl",spline);
     symbol_table.add_function("saw",saw);
     symbol_table.add_function("tri",tri);
@@ -603,15 +680,17 @@ struct FormulaOne : Module {
     v8=0;
     dcb.reset();
   }
+
   func_parse_result parse_function_definition(std::string &func_def,function_definition &cf) {
     parse_function_definition_impl parser;
     return parser.process(func_def,cf);
   }
+
   bool resolveFunctions(std::string &form) {
     std::string::size_type pos=form.find("function",0);
     if(pos==std::string::npos)
       return false;
-    form = form.substr(pos);
+    form=form.substr(pos);
     function_definition fd;
 
     func_parse_result fp_result=parse_function_definition(form,fd);
@@ -633,15 +712,6 @@ struct FormulaOne : Module {
 
       if(function_symbol_table.get_function(fd.name)) {
         function_symbol_table.remove_function(fd.name);
-        /*
-        for(std::size_t i=0;i<func_def_list_.size();++i) {
-          if(exprtk::details::imatch(fd.name,func_def_list_[i].name)) {
-            func_def_list_.erase(func_def_list_.begin()+i);
-
-            break;
-          }
-        }
-        */
       }
 
       if(!compositor.add(f,true)) {
@@ -652,14 +722,13 @@ struct FormulaOne : Module {
         return false;
       }
 
-      printf("Function\n");
-      printf("Name: %s      \n",fd.name.c_str());
-      printf("Vars: (%s)    \n",vars.c_str());
-      printf("------------------------------------------------------\n");
+      INFO("Function\n");
+      INFO("Name: %s      \n",fd.name.c_str());
+      INFO("Vars: (%s)    \n",vars.c_str());
+      INFO("------------------------------------------------------\n");
 
-      //func_def_list_.push_back(fd);
     } else if(e_parse_notfunc!=fp_result) {
-      printf("Error - Critical parsing error - partial parse occured\n");
+      INFO("Error - Critical parsing error - partial parse occured\n");
       return false;
     }
     return resolveFunctions(form);
@@ -708,5 +777,13 @@ struct FormulaOne : Module {
     dirty=true;
   }
 };
+struct TextScrollWidget : ScrollWidget {
+  void onHover(const HoverEvent &e) override {
+    ScrollWidget::onHover(e);
+    if(!isScrolling()) {
+      APP->event->setSelectedWidget(container->children.front());
+    }
+  }
 
+};
 #endif //DBCAEMODULES_FASTFORMULA_HPP
