@@ -445,7 +445,7 @@ void MTextField::onSelectKey(const SelectKeyEvent &e) {
     float px,py;
     getCursorPosition(px,py);
     //INFO("%f %f %f %f %f",px,py,scroll->offset.x,scroll->offset.y,scroll->box.size.y);
-    while(py>176+scroll->offset.y) scroll->offset.y+=10;
+    while(py>scroll->box.size.y-24+scroll->offset.y) scroll->offset.y+=10;
     while(py<scroll->offset.y) scroll->offset.y-=10;
     if(scroll->offset.y<0) scroll->offset.y = 0;
     assert(0<=cursor);

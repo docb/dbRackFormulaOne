@@ -741,7 +741,7 @@ struct FormulaOne : Module {
     std::this_thread::sleep_for(std::chrono::duration<double>(100e-6));
     std::string form=formula;
     resolveFunctions(form);
-    INFO("code after parsing functions %s",form.c_str());
+    //INFO("code after parsing functions %s",form.c_str());
     compiled=parser.compile(form,expression);
     if(!compiled) {
       INFO("Error: %s\n",parser.error().c_str());
@@ -775,6 +775,7 @@ struct FormulaOne : Module {
       formula=json_string_value(textJ);
     compile();
     dirty=true;
+
   }
 };
 struct TextScrollWidget : ScrollWidget {

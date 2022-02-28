@@ -81,6 +81,7 @@ struct FormulaTextField : MTextField {
       int cursorSave=cursor;
       setText(module->formula);
       cursor=selection=cursorSave;
+      if(cursor<0 || cursor>(int)text.size()) selection=cursor=0;
       module->dirty=false;
       module->extDirty=true;
     }
