@@ -317,6 +317,74 @@ o;
 ```
 Outputs line segments according to the values and duration arrays. It is triggered via the
 `w` input.
+As this is a common usecase the example can be simplified as so:
+```Tcl
+if(st(0,w)>0) { v1:=0; }
+var o:=lseg(v1,0,0.3,5,0.2,3,0.5,2,0.3,
+        2,0.2,0);
+v1+=stim;
+o;
+```
+The function `lseg` takes as shown the phase as first parameter then alternating value
+and duration. If the last value is missing the first value is used instead.
+
+Additionally there is a function eseg providing exponential segments
+
+![](images/ExpSeg.png?raw=true)
+
+```Tcl
+var o:=eseg(v1, 0,0.3,-5, 5,0.5,-4,
+               2,0.3,0, 2,0.5,-3, 0);
+if(st(0,w)>0) v1:=0;
+
+v1+=stim;
+o;
+```
+
+The `eseg` function takes three alternating parameters value, duration, bending.
+The sign of the bending parameter determines if the curve 
+is fast decaying/raising (<0) or slow decaying/raising (>0). 
+
+
+### Waveshaping
+![](images/waveshaping1.png?raw=true)
+
+This example shows the definition and use of a user defined function.
+```Tcl
+function sign(f) {
+   f<0?-1:(f>0?1:0);
+}
+var p:= scl1(-a,0.01,10);
+// waveshaping function
+sign(x)*(1-p/(abs(x)+p))*5;
+```
+
+Functions must be defined always on top, before the normal code starts.
+The return value of a function is always the value of the last expression.
+
+
+There are some convenient functions provided for scaling:
+
+`scl(input,minInput,maxInput,minOutput,maxOutput)`
+
+this function scales the input expected in the range minInput,maxInput to the
+target range minOutput,maxOutput.
+
+`scl1` as shown in the example is a shortcut for 
+
+`scl(input,-1,1,minOutput,maxOutput)`
+
+-- suited for the knob inputs.
+
+#### Wavshaping with exp segemnts
+
+![](images/Waveshaping2.png?raw=true)
+
+```Tcl
+eseg(t,-1,0.5,a*10,1,0.5,b*10,-1)*5
+```
+This example shows the use of the `eseg` function (see above) for waveshaping.
+Play around with knob a and b.
 
 ### CZ-Series PD Filter sweep
 

@@ -2,7 +2,11 @@
 RACK_DIR ?= ../..
 
 # FLAGS will be passed to both the C and C++ compiler
-#FLAGS += -Wa,-mbig-obj
+FLAGS +=
+include $(RACK_DIR)/arch.mk
+ifdef ARCH_WIN
+FLAGS += -Wa,-mbig-obj
+endif
 CFLAGS +=
 CXXFLAGS +=
 
