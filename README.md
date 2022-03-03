@@ -32,6 +32,8 @@ The examples are available as factory presets.
 - [Chord Sequencer](#chord-sequencer)
 - [Gate Sequencer](#gate-sequencer)
 - [A Line Segment Envelope Generator](#a-line-segment-envelope-generator)
+- [Waveshaping](#waveshaping)
+  - [Wavshaping with exp segemnts](#wavshaping-with-exp-segemnts)
 - [CZ-Series PD Filter sweep](#cz-series-pd-filter-sweep)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
