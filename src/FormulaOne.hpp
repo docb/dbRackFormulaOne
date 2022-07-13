@@ -48,7 +48,15 @@ struct RB {
       idx+=len;
     return data[idx%len];
   }
-
+  T sum(int relPos) {
+    while(relPos<0)
+      relPos+=len;
+    T s= T(0);
+    for(int k=relPos;k<len;k++) {
+      s+=get(k);
+    }
+    return s;
+  }
   void clear() {
     pos=0;
     len=1024;
@@ -78,7 +86,11 @@ struct RBuffers {
       return T(0);
     return buffers[nr].get(relPos);
   }
-
+  T sum(int nr,int relPos) {
+    if(nr<0||nr>=K)
+      return T(0);
+    return buffers[nr].sum(relPos);
+  }
   void clear() {
     for(size_t j=0;j<K;j++) {
       buffers[j].clear();
@@ -262,7 +274,20 @@ struct RBGet : public exprtk::ifunction<T> {
     return T(0);
   }
 };
+template<typename T,size_t S,size_t K>
+struct RBSum : public exprtk::ifunction<T> {
+  using exprtk::ifunction<T>::operator();
+  RBuffers<T,S,K> *buffers=nullptr;
 
+  RBSum() : exprtk::ifunction<T>(2) {
+  }
+
+  inline T operator()(const T &nr,const T &v)  override {
+    if(buffers)
+      return buffers->sum(int(nr),int(v));
+    return T(0);
+  }
+};
 template<typename T,size_t S>
 struct BufferWrite : public exprtk::ifunction<T> {
   using exprtk::ifunction<T>::operator();
@@ -563,6 +588,7 @@ struct FormulaOne : Module {
   RBuffers<float,48000,16> rBuffers;
   RBPush<float,48000,16> bufPush;
   RBGet<float,48000,16> bufGet;
+  RBSum<float,48000,16> bufSum;
   RBSetLength<float,48000,16> bufSetLength;
 
   Buffer<float,4096> buf[4];
@@ -630,10 +656,12 @@ struct FormulaOne : Module {
       bufRead[k].buffer=&buf[k];
     }
     bufGet.buffers=&rBuffers;
+    bufSum.buffers=&rBuffers;
     bufPush.buffers=&rBuffers;
     bufSetLength.buffers=&rBuffers;
     symbol_table.add_function("rblen",bufSetLength);
     symbol_table.add_function("rbget",bufGet);
+    symbol_table.add_function("rbsum",bufSum);
     symbol_table.add_function("rbpush",bufPush);
     symbol_table.add_function("bufr",bufRead[0]);
     symbol_table.add_function("bufw",bufWrite[0]);
