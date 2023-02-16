@@ -4,7 +4,7 @@
 // Uses also some functions of the blender utilities directly to provide more lines in the text.
 // Adds the feature to move up and down using the arrow keys.
 
-#include "plugin.hpp"
+//#include "plugin.hpp"
 #define _BND_MAX_ROWS 100
 #define _BND_MAX_GLYPHS 10240
 struct TextRow {

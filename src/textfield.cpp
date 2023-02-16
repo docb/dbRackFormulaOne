@@ -1,3 +1,4 @@
+#include "plugin.hpp"
 #include "textfield.hpp"
 #include <helpers.hpp>
 #include <context.hpp>
@@ -376,6 +377,56 @@ void MTextField::onSelectKey(const SelectKeyEvent &e) {
       e.consume(this);
     }
 
+    if(e.key==GLFW_KEY_HOME) {
+      if((e.mods&RACK_MOD_MASK)==RACK_MOD_CTRL) {
+        selection=0;
+        cursor=0;
+      } else if((e.mods&RACK_MOD_MASK)==(GLFW_MOD_SHIFT|RACK_MOD_CTRL)) {
+        cursor=0;
+      } else if((e.mods&RACK_MOD_MASK)==0) {
+        split();
+        for(int k=0;k<currentMax;k++) {
+          if(cursor>=textRows[k].begin&&cursor<=textRows[k].end) {
+            selection=cursor=textRows[k].begin;
+          }
+        }
+      } else if((e.mods&RACK_MOD_MASK)==GLFW_MOD_SHIFT) {
+        split();
+        for(int k=0;k<currentMax;k++) {
+          if(cursor>=textRows[k].begin&&cursor<=textRows[k].end) {
+            cursor=textRows[k].begin;
+          }
+        }
+      }
+      e.consume(this);
+    }
+
+    if(e.key==GLFW_KEY_END) {
+      if((e.mods&RACK_MOD_MASK)==RACK_MOD_CTRL) {
+        selection=text.size();
+        cursor=text.size();
+      } else if((e.mods&RACK_MOD_MASK)==(GLFW_MOD_SHIFT|RACK_MOD_CTRL)) {
+        cursor=text.size();
+      } else if((e.mods&RACK_MOD_MASK)==0) {
+        split();
+        for(int k=0;k<currentMax;k++) {
+          if(cursor>=textRows[k].begin&&cursor<=textRows[k].end) {
+            selection=cursor=textRows[k].end;
+          }
+        }
+      } else if((e.mods&RACK_MOD_MASK)==GLFW_MOD_SHIFT) {
+        split();
+        for(int k=0;k<currentMax;k++) {
+          if(cursor>=textRows[k].begin&&cursor<=textRows[k].end) {
+            cursor=textRows[k].end;
+          }
+        }
+      }
+      e.consume(this);
+    }
+
+
+    /*
     // Home
     if(e.key==GLFW_KEY_HOME&&(e.mods&RACK_MOD_MASK)==0) {
       selection=cursor=0;
@@ -396,6 +447,7 @@ void MTextField::onSelectKey(const SelectKeyEvent &e) {
       cursor=text.size();
       e.consume(this);
     }
+     */
     // Ctrl+V
     if(e.keyName=="v"&&(e.mods&RACK_MOD_MASK)==RACK_MOD_CTRL) {
       pasteClipboard(false);
@@ -448,6 +500,11 @@ void MTextField::onSelectKey(const SelectKeyEvent &e) {
     while(py>scroll->box.size.y-24+scroll->offset.y) scroll->offset.y+=10;
     while(py<scroll->offset.y) scroll->offset.y-=10;
     if(scroll->offset.y<0) scroll->offset.y = 0;
+
+    while(px>scroll->box.size.x-24+scroll->offset.x) scroll->offset.x+=10;
+    while(px<scroll->offset.x) scroll->offset.x-=10;
+    if(scroll->offset.x<0) scroll->offset.x = 0;
+
     assert(0<=cursor);
     assert(cursor<=(int)text.size());
     assert(0<=selection);
