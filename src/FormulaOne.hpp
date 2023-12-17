@@ -393,6 +393,66 @@ struct Tri : public exprtk::ifunction<T> {
 
 };
 
+template<typename T,typename M>
+struct InX : public exprtk::ifunction<T> {
+  using exprtk::ifunction<T>::operator();
+  M *m=nullptr;
+  explicit InX(M *_m) : exprtk::ifunction<T>(1),m(_m) {
+  }
+
+  inline T operator()(const T &v) override  {
+    if(v>=0 && v<16) {
+      return m->inputs[M::X_INPUT].getVoltage((int)v);
+    }
+    return 0;
+  }
+};
+
+template<typename T,typename M>
+struct InY : public exprtk::ifunction<T> {
+  using exprtk::ifunction<T>::operator();
+  M *m=nullptr;
+  explicit InY(M *_m) : exprtk::ifunction<T>(1),m(_m) {
+  }
+
+  inline T operator()(const T &v) override  {
+    if(v>=0 && v<16) {
+      return m->inputs[M::Y_INPUT].getVoltage((int)v);
+    }
+    return 0;
+  }
+};
+
+template<typename T,typename M>
+struct InZ : public exprtk::ifunction<T> {
+  using exprtk::ifunction<T>::operator();
+  M *m=nullptr;
+  explicit InZ(M *_m) : exprtk::ifunction<T>(1),m(_m) {
+  }
+
+  inline T operator()(const T &v) override  {
+    if(v>=0 && v<16) {
+      return m->inputs[M::Z_INPUT].getVoltage((int)v);
+    }
+    return 0;
+  }
+};
+
+template<typename T,typename M>
+struct InW : public exprtk::ifunction<T> {
+  using exprtk::ifunction<T>::operator();
+  M *m=nullptr;
+  explicit InW(M *_m) : exprtk::ifunction<T>(1),m(_m) {
+  }
+
+  inline T operator()(const T &v) override  {
+    if(v>=0 && v<16) {
+      return m->inputs[M::W_INPUT].getVoltage((int)v);
+    }
+    return 0;
+  }
+};
+
 template<typename T>
 struct Scale : public exprtk::ifunction<T> {
   using exprtk::ifunction<T>::operator();
@@ -526,6 +586,11 @@ struct FormulaOne : Module {
   enum LightId {
     ERROR_LIGHT,OK_LIGHT,LIGHTS_LEN
   };
+
+  enum PolyMode {
+    MAX,X,Y,Z,W
+  };
+
   symbol_table_t symbol_table;
   symbol_table_t function_symbol_table;
   expression_t expression;
@@ -574,6 +639,8 @@ struct FormulaOne : Module {
   DCBlock<float> dcb;
   DCBlock<float> dcb2;
 
+  int polyMode=MAX;
+
   Poly<float> poly;
   Chebyshev<float> chebyshev;
   LinSeg<float> linseg;
@@ -587,7 +654,10 @@ struct FormulaOne : Module {
   Coin<float> coin;
   BetaRnd<float> beta;
   Weibull<float> weibull;
-
+  InX<float,FormulaOne> inX{this};
+  InY<float,FormulaOne> inY{this};
+  InZ<float,FormulaOne> inZ{this};
+  InW<float,FormulaOne> inW{this};
 
   FormulaOne() {
     config(PARAMS_LEN,INPUTS_LEN,OUTPUTS_LEN,LIGHTS_LEN);
@@ -597,6 +667,8 @@ struct FormulaOne : Module {
     configInput(W_INPUT,"w");
     configInput(P_INPUT,"t - Phase ([-5,5] -> [0,1])");
     configOutput(V_OUTPUT,"CV");
+    configOutput(V1_OUTPUT,"CV 1");
+    configOutput(V2_OUTPUT,"CV 2");
     configParam(A_PARAM,-1,1,0,"a");
     configParam(B_PARAM,-1,1,0,"b");
     configParam(C_PARAM,-1,1,0,"c");
@@ -660,6 +732,10 @@ struct FormulaOne : Module {
     symbol_table.add_function("tri",tri);
     symbol_table.add_function("scl",scale);
     symbol_table.add_function("scl1",scale1);
+    symbol_table.add_function("getX",inX);
+    symbol_table.add_function("getY",inY);
+    symbol_table.add_function("getZ",inZ);
+    symbol_table.add_function("getW",inW);
     symbol_table.add_constants();
     compositor.add_auxiliary_symtab(symbol_table);
     expression.register_symbol_table(compositor.symbol_table());
@@ -752,7 +828,6 @@ struct FormulaOne : Module {
         INFO("Error: %02d Position: %02d Type: [%14s] Msg: %s\tExpression: %s\n",i,error.token.position,exprtk::parser_error::to_str(error.mode).c_str(),error.diagnostic.c_str(),formula.c_str());
       }
     }
-
   }
 
   void process(const ProcessArgs &args) override;
@@ -766,6 +841,7 @@ struct FormulaOne : Module {
   json_t *dataToJson() override {
     json_t *rootJ=json_object();
     json_object_set_new(rootJ,"formula",json_string(formula.c_str()));
+    json_object_set_new(rootJ,"polyMode",json_integer(polyMode));
     return rootJ;
   }
 
@@ -773,6 +849,9 @@ struct FormulaOne : Module {
     json_t *textJ=json_object_get(rootJ,"formula");
     if(textJ)
       formula=json_string_value(textJ);
+    json_t *polyModeJ=json_object_get(rootJ,"polyMode");
+    if(polyModeJ)
+      polyMode =json_integer_value(polyModeJ);
     compile();
     dirty=true;
 

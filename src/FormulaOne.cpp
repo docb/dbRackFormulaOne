@@ -17,10 +17,26 @@ void FormulaOne::process(const ProcessArgs &args) {
     if(inputs[P_INPUT].isConnected()) {
       channels=inputs[P_INPUT].getChannels();
     } else {
-      channels=inputs[W_INPUT].getChannels();
-      channels=std::max(channels,inputs[X_INPUT].getChannels());
-      channels=std::max(channels,inputs[Y_INPUT].getChannels());
-      channels=std::max(channels,inputs[Z_INPUT].getChannels());
+      switch(polyMode) {
+        case X:
+          channels=inputs[X_INPUT].getChannels();
+          break;
+        case Y:
+          channels=inputs[Y_INPUT].getChannels();
+          break;
+        case Z:
+          channels=inputs[Z_INPUT].getChannels();
+          break;
+        case W:
+          channels=inputs[W_INPUT].getChannels();
+          break;
+        default:
+          channels=inputs[W_INPUT].getChannels();
+          channels=std::max(channels,inputs[X_INPUT].getChannels());
+          channels=std::max(channels,inputs[Y_INPUT].getChannels());
+          channels=std::max(channels,inputs[Z_INPUT].getChannels());
+          break;
+      }
       if(channels==0)
         channels=1;
     }
@@ -91,7 +107,7 @@ struct FormulaTextField : MTextField {
 
 struct FormulaOneWidget : ModuleWidget {
   float ms=mm2px(Vec(5.08f,0)).x;
-
+  std::vector<std::string> polyModeLabels={"Max","x","y","z","w"};
   FormulaOneWidget(FormulaOne *module) {
     ScrollWidget *scrollWidget;
     setModule(module);
@@ -101,9 +117,6 @@ struct FormulaOneWidget : ModuleWidget {
     addChild(createWidget<ScrewSilver>(Vec(box.size.x-2*RACK_GRID_WIDTH,0)));
     addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH,RACK_GRID_HEIGHT-RACK_GRID_WIDTH)));
     addChild(createWidget<ScrewSilver>(Vec(box.size.x-2*RACK_GRID_WIDTH,RACK_GRID_HEIGHT-RACK_GRID_WIDTH)));
-    //auto textDisplay = createWidget<LedDisplay>(mm2px(Vec(3, 13)));
-    //textDisplay->box.size = mm2px(Vec(85, 51));
-    //addChild(textDisplay);
     scrollWidget=new TextScrollWidget();
     scrollWidget->box.size=mm2px(Vec(85,68));
     scrollWidget->box.pos=mm2px(Vec(3.5f,MHEIGHT-54-68));
@@ -131,7 +144,17 @@ struct FormulaOneWidget : ModuleWidget {
     addOutput(createOutput<SmallPort>(mm2px(Vec(79.212,MHEIGHT-24-6.27f)),module,FormulaOne::V1_OUTPUT));
     addOutput(createOutput<SmallPort>(mm2px(Vec(79.212,MHEIGHT-38-6.27f)),module,FormulaOne::V2_OUTPUT));
   }
+  void appendContextMenu(Menu *menu) override {
+    FormulaOne *module=dynamic_cast<FormulaOne *>(this->module);
+    assert(module);
+    menu->addChild(new MenuSeparator);
+    auto inSelect=new LabelIntSelectItem(&module->polyMode,polyModeLabels);
+    inSelect->text="Channels from";
+    inSelect->rightText=polyModeLabels[module->polyMode]+"  "+RIGHT_ARROW;
+    menu->addChild(inSelect);
 
+
+  }
 };
 
 

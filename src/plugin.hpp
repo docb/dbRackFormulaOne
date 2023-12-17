@@ -47,3 +47,23 @@ struct SmallPort : app::SvgPort {
     setSvg(APP->window->loadSvg(asset::plugin(pluginInstance,"res/SmallPort.svg")));
   }
 };
+
+struct LabelIntSelectItem : MenuItem {
+  int *value;
+  std::vector<std::string> labels;
+
+  LabelIntSelectItem(int *val,std::vector<std::string> _labels) : value(val),labels(std::move(_labels)) {
+  }
+
+  Menu *createChildMenu() override {
+    Menu *menu=new Menu;
+    for(unsigned k=0;k<labels.size();k++) {
+      menu->addChild(createCheckMenuItem(labels[k],"",[=]() {
+        return *value==int(k);
+      },[=]() {
+        *value=k;
+      }));
+    }
+    return menu;
+  }
+};

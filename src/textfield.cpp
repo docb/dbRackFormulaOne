@@ -578,7 +578,9 @@ void MTextField::pasteClipboard(bool menu) {
   const char *newText=glfwGetClipboardString(APP->window->win);
   if(!newText)
     return;
-  insertText(newText);
+  std::string strText(newText);
+  strText.erase(std::remove(strText.begin(), strText.end(), 0x0d), strText.end());
+  insertText(strText);
 }
 
 void MTextField::cursorToPrevWord() {

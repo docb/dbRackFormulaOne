@@ -54,7 +54,9 @@
 #include <string>
 #include <utility>
 #include <vector>
-
+#define exprtk_disable_break_continue
+#define exprtk_disable_rtl_io_file
+#define exprtk_disable_rtl_vecops
 
 namespace exprtk
 {
